@@ -7,30 +7,24 @@ import { kv } from '@vercel/kv'
 import { auth } from '@/auth'
 import { type Chat } from '@/lib/types'
 
-export async function getChats(userId?: string | null) {
+export async function getChats(userId?: string | null): Promise<Chat[]> {
   if (!userId) {
     return []
   }
 
-  try {
-    const pipeline = kv.pipeline()
-    const chats: string[] = await kv.zrange(`user:chat:${userId}`, 0, -1, {
-      rev: true
-    })
+  const chats: string[] = await kv.zrange(`user:chat:${userId}`, 0, -1, {
+    rev: true
+  })
 
-    for (const chat of chats) {
-      pipeline.hgetall(chat)
-    }
+  const chatPromises = chats.map(async (chat) => {
+    const chatData = await kv.hgetall<Chat>(chat)
+    return chatData
+  })
 
-    const results = await pipeline.exec()
-
-    return results as Chat[]
-  } catch (error) {
-    return []
-  }
+  return Promise.all(chatPromises)
 }
 
-export async function getChat(id: string, userId: string) {
+export async function getChat(id: string, userId: string): Promise<Chat | null> {
   const chat = await kv.hgetall<Chat>(`chat:${id}`)
 
   if (!chat || (userId && chat.userId !== userId)) {
@@ -40,7 +34,7 @@ export async function getChat(id: string, userId: string) {
   return chat
 }
 
-export async function removeChat({ id, path }: { id: string; path: string }) {
+export async function removeChat({ id, path }: { id: string; path: string }): Promise<{ error?: string }> {
   const session = await auth()
 
   if (!session) {
@@ -49,7 +43,6 @@ export async function removeChat({ id, path }: { id: string; path: string }) {
     }
   }
 
-  //Convert uid to string for consistent comparison with session.user.id
   const uid = String(await kv.hget(`chat:${id}`, 'userId'))
 
   if (uid !== session?.user?.id) {
@@ -65,7 +58,7 @@ export async function removeChat({ id, path }: { id: string; path: string }) {
   return revalidatePath(path)
 }
 
-export async function clearChats() {
+export async function clearChats(): Promise<{ error?: string }> {
   const session = await auth()
 
   if (!session?.user?.id) {
@@ -78,6 +71,7 @@ export async function clearChats() {
   if (!chats.length) {
     return redirect('/')
   }
+
   const pipeline = kv.pipeline()
 
   for (const chat of chats) {
@@ -91,7 +85,7 @@ export async function clearChats() {
   return redirect('/')
 }
 
-export async function getSharedChat(id: string) {
+export async function getSharedChat(id: string): Promise<Chat | null> {
   const chat = await kv.hgetall<Chat>(`chat:${id}`)
 
   if (!chat || !chat.sharePath) {
@@ -101,7 +95,7 @@ export async function getSharedChat(id: string) {
   return chat
 }
 
-export async function shareChat(id: string) {
+export async function shareChat(id: string): Promise<Chat | { error: string }> {
   const session = await auth()
 
   if (!session?.user?.id) {
