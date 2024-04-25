@@ -3,7 +3,7 @@
 
 'use client'
 
-import { FC, memo } from 'react'
+import { FC, memo, useCallback, useState } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { coldarkDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 
@@ -12,15 +12,11 @@ import { IconCheck, IconCopy, IconDownload } from '@/components/ui/icons'
 import { Button } from '@/components/ui/button'
 
 interface Props {
-  language: string
+  language: keyof typeof programmingLanguages
   value: string
 }
 
-interface languageMap {
-  [key: string]: string | undefined
-}
-
-export const programmingLanguages: languageMap = {
+export const programmingLanguages = {
   javascript: '.js',
   python: '.py',
   java: '.java',
@@ -58,8 +54,9 @@ export const generateRandomString = (length: number, lowercase = false) => {
 
 const CodeBlock: FC<Props> = memo(({ language, value }) => {
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+  const [isDownloaded, setIsDownloaded] = useState(false)
 
-  const downloadAsFile = () => {
+  const downloadAsFile = useCallback(() => {
     if (typeof window === 'undefined') {
       return
     }
@@ -79,18 +76,21 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.download = fileName
+    link.rel = 'noopener'
     link.href = url
     link.style.display = 'none'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
-  }
+    setIsDownloaded(true)
+    setTimeout(() => setIsDownloaded(false), 2000)
+  }, [language, value])
 
-  const onCopy = () => {
+  const onCopy = useCallback(() => {
     if (isCopied) return
     copyToClipboard(value)
-  }
+  }, [isCopied, copyToClipboard, value])
 
   return (
     <div className="relative w-full font-sans codeblock bg-zinc-950">
@@ -102,18 +102,18 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
             className="hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
             onClick={downloadAsFile}
             size="icon"
+            title="Download"
           >
             <IconDownload />
-            <span className="sr-only">Download</span>
           </Button>
           <Button
             variant="ghost"
             size="icon"
             className="text-xs hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
             onClick={onCopy}
+            title="Copy code"
           >
             {isCopied ? <IconCheck /> : <IconCopy />}
-            <span className="sr-only">Copy code</span>
           </Button>
         </div>
       </div>
@@ -126,23 +126,4 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
           margin: 0,
           width: '100%',
           background: 'transparent',
-          padding: '1.5rem 1rem'
-        }}
-        lineNumberStyle={{
-          userSelect: "none",
-        }}
-        codeTagProps={{
-          style: {
-            fontSize: '0.9rem',
-            fontFamily: 'var(--font-mono)'
-          }
-        }}
-      >
-        {value}
-      </SyntaxHighlighter>
-    </div>
-  )
-})
-CodeBlock.displayName = 'CodeBlock'
-
-export { CodeBlock }
+         
