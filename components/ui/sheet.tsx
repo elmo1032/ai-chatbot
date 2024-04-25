@@ -1,71 +1,16 @@
+// Import necessary modules and components
 import * as React from 'react'
 import * as SheetPrimitive from '@radix-ui/react-dialog'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { IconClose } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 import { background, foreground, mutedForeground, secondary } from '@/lib/theme'
-import {
-  slideInFromLeft,
-  slideOutToLeft,
-  slideInFromRight,
-  slideOutToRight,
-  slideInFromTop,
-  slideOutToTop,
-  slideInFromBottom,
-  slideOutToBottom,
-  z50,
-  fixed,
-  inset0,
-  p6,
-  shadowLg,
-  borderB,
-  borderT,
-  borderR,
-  borderL,
-  w34,
-  hFull,
-  maxWsm,
-  bgBackground,
-  bgSecondary,
-  textCenter,
-  textLeft,
-  textLg,
-  fontSemibold,
-  textForeground,
-  textSm,
-  fontNormal,
-  textMutedForeground,
-  opacity70,
-  ringOffsetBackground,
-  ring2,
-  ringRing,
-  focusOutlineNone,
-  focusRing2,
-  focusRingOffset2,
-  disabledPointerEventsNone,
-  dataOpenBgSecondary,
-  dataClosedSlideOutToTop,
-  dataOpenSlideInFromTop,
-  dataClosedSlideOutToBottom,
-  dataOpenSlideInFromBottom,
-  dataClosedSlideOutToLeft,
-  dataOpenSlideInFromLeft,
-  dataClosedSlideOutToRight,
-  dataOpenSlideInFromRight,
-  absolute,
-  right4,
-  top4,
-  roundedSm,
-  transitionOpacity,
-  hoverOpacity100,
-  focusOpacity100
-} from '@/lib/classes'
 
-type SheetContentProps = React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & VariantProps<typeof sheetVariants>
-
+// Define custom variants for the sheet component
 const sheetVariants = cva(
   'fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
   {
+    // Define the side variant with 4 options: top, bottom, left, and right
     variants: {
       side: {
         top: 'inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
@@ -74,11 +19,30 @@ const sheetVariants = cva(
         right: 'inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm'
       }
     },
+    // Set the default variant to 'right'
     defaultVariants: {
       side: 'right'
     }
   }
 )
 
+// Define the SheetOverlay component using forwardRef
 const SheetOverlay = React.forwardRef<
-  React
+  React.ElementRef<typeof SheetPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
+>((props, ref) => {
+  // Render the SheetOverlay component
+})
+
+// Define the SheetContentProps type
+type SheetContentProps = React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & VariantProps<typeof sheetVariants>
+
+// Define the SheetContent component
+const SheetContent = React.forwardRef<
+  React.ElementRef<typeof SheetPrimitive.Content>,
+  SheetContentProps
+>(({ className, side, children, ...props }, ref) => {
+  // Render the SheetContent component
+})
+
+export { SheetOverlay, SheetContent }
