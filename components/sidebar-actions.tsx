@@ -1,9 +1,10 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import * as React from 'react'
-import { toast } from 'react-hot-toast'
+import { useRouter } from 'next/navigation' // Importing useRouter hook from Next.js navigation package
+import * as React from 'react' // Importing React library
+import { toast } from 'react-hot-toast' // Importing toast function from react-hot-toast package
 
+// Importing custom components and types
 import { ServerActionResult, type Chat } from '@/lib/types'
 import {
   AlertDialog,
@@ -24,62 +25,68 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 
+// Defining SidebarActionsProps interface for SidebarActions component props
 interface SidebarActionsProps {
   chat: Chat
   removeChat: (args: { id: string; path: string }) => Promise<ServerActionResult<void>>
   shareChat: (id: string) => Promise<ServerActionResult<Chat>>
 }
 
+// SidebarActions component
 export function SidebarActions({
-  chat,
-  removeChat,
-  shareChat
+  chat, // Chat object to be used in the component
+  removeChat, // removeChat function to delete a chat
+  shareChat // shareChat function to share a chat
 }: SidebarActionsProps) {
-  const router = useRouter()
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
-  const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
-  const [isRemovePending, startRemoveTransition] = React.useTransition()
-  const [removeError, setRemoveError] = React.useState<string | null>(null)
-  const [shareError, setShareError] = React.useState<string | null>(null)
+  const router = useRouter() // Initializing useRouter hook
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false) // State for delete dialog visibility
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false) // State for share dialog visibility
+  const [isRemovePending, startRemoveTransition] = React.useTransition() // State and function for remove transition
+  const [removeError, setRemoveError] = React.useState<string | null>(null) // State for remove error message
+  const [shareError, setShareError] = React.useState<string | null>(null) // State for share error message
 
+  // Function for handling chat sharing
   const handleShareChat = async (id: string) => {
-    setShareError(null)
+    setShareError(null) // Resetting share error message
     try {
-      const result = await shareChat(id)
-      if (result && 'error' in result) {
-        setShareError(result.error)
+      const result = await shareChat(id) // Calling shareChat function
+      if (result && 'error' in result) { // Checking for error in the result
+        setShareError(result.error) // Setting share error message
         return
       }
-      toast.success('Chat shared')
-      setShareDialogOpen(false)
+      toast.success('Chat shared') // Showing success toast message
+      setShareDialogOpen(false) // Hiding share dialog
     } catch (error) {
-      setShareError('An error occurred while sharing the chat')
+      setShareError('An error occurred while sharing the chat') // Setting share error message
     }
   }
 
+  // Function for handling chat removal
   const handleRemoveChat = async (event: React.FormEvent<HTMLFormElement>, id: string, path: string) => {
-    event.preventDefault()
-    setRemoveError(null)
-    startRemoveTransition(async () => {
-      setDeleteDialogOpen(false)
+    event.preventDefault() // Preventing default form submission behavior
+    setRemoveError(null) // Resetting remove error message
+    startRemoveTransition(async () => { // Starting remove transition
+      setDeleteDialogOpen(false) // Hiding delete dialog
       try {
-        const result = await removeChat({ id, path })
-        if (result && 'error' in result) {
-          setRemoveError(result.error)
+        const result = await removeChat({ id, path }) // Calling removeChat function
+        if (result && 'error' in result) { // Checking for error in the result
+          setRemoveError(result.error) // Setting remove error message
           return
         }
-        toast.success('Chat deleted')
-        router.refresh()
-        router.push('/')
+        toast.success('Chat deleted') // Showing success toast message
+        router.refresh() // Refreshing the page
+        router.push('/') // Navigating to home page
       } catch (error) {
-        setRemoveError('An error occurred while deleting the chat')
+        setRemoveError('An error occurred while deleting the chat') // Setting remove error message
       }
     })
   }
 
+  // JSX for SidebarActions component
   return (
     <>
       <div className="space-x-1">
+        {/* Tooltip for Share button */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -93,6 +100,7 @@ export function SidebarActions({
           </TooltipTrigger>
           <TooltipContent>Share chat</TooltipContent>
         </Tooltip>
+        {/* Tooltip for Delete button */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -108,13 +116,15 @@ export function SidebarActions({
           <TooltipContent>Delete chat</TooltipContent>
         </Tooltip>
       </div>
+      {/* ChatShareDialog component for sharing a chat */}
       <ChatShareDialog
-        chat={chat}
-        shareChat={handleShareChat}
-        open={shareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-        onCopy={() => setShareDialogOpen(false)}
+        chat={chat} // Chat object
+        shareChat={handleShareChat} // Function for handling chat sharing
+        open={shareDialogOpen} // State for dialog visibility
+        onOpenChange={setShareDialogOpen} // Function for handling dialog open state change
+        onCopy={() => setShareDialogOpen(false)} // Function for handling copy action
       />
+      {/* AlertDialog component for deleting a chat */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -132,13 +142,15 @@ export function SidebarActions({
               disabled={isRemovePending}
               onClick={(event) => handleRemoveChat(event, chat.id, chat.path)}
             >
-              {isRemovePending && <IconSpinner className="mr-2 animate-spin" />}
+              {isRemovePending && <IconSpinner className="mr-2 animate-spin" />} {/* Spinner for remove transition */}
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* Error toast message for remove error */}
       {removeError && toast.error(removeError)}
+      {/* Error toast message for share error */}
       {shareError && toast.error(shareError)}
     </>
   )
