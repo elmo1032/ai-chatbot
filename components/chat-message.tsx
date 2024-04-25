@@ -1,10 +1,6 @@
-// Inspired by Chatbot-UI and modified to fit the needs of this project
-// @see https://github.com/mckaywrigley/chatbot-ui/blob/main/components/Chat/ChatMessage.tsx
-
 import { Message } from 'ai'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-
 import { cn } from '@/lib/utils'
 import { CodeBlock } from '@/components/ui/codeblock'
 import { MemoizedReactMarkdown } from '@/components/markdown'
@@ -15,11 +11,18 @@ export interface ChatMessageProps {
   message: Message
 }
 
-export function ChatMessage({ message, ...props }: ChatMessageProps) {
+interface IconProps {
+  role: 'user' | 'assistant'
+}
+
+const Icon = ({ role, children }: React.PropsWithChildren<IconProps>) => {
+  return <IconUser alt={role} className={cn(role === 'user' && 'rotate-180')} />
+}
+
+export function ChatMessage({ message }: ChatMessageProps) {
   return (
     <div
       className={cn('group relative mb-4 flex items-start md:-ml-12')}
-      {...props}
     >
       <div
         className={cn(
@@ -29,7 +32,7 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
             : 'bg-primary text-primary-foreground'
         )}
       >
-        {message.role === 'user' ? <IconUser /> : <IconOpenAI />}
+        <Icon role={message.role} />
       </div>
       <div className="flex-1 px-1 ml-4 space-y-2 overflow-hidden">
         <MemoizedReactMarkdown
@@ -78,3 +81,4 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
     </div>
   )
 }
+
