@@ -1,7 +1,12 @@
+# This line prints the string "Hello, World!" to the console.
 print("Hello, World!")
 
 
+# The variable 'message' is assigned the string value "Hello".
 message = "Hello"
+
+# The variable 'recipient' is assigned the string value "World".
 recipient = "World"
 
+# This line prints a formatted string that includes the values of the 'message' and 'recipient' variables.
 print(f"{message}, {recipient}!")
