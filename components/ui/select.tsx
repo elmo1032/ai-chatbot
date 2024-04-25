@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import * as SelectPrimitive from '@radix-ui/react-select'
-
 import { cn } from '@/lib/utils'
 import {
   IconArrowDown,
@@ -79,10 +78,11 @@ SelectLabel.displayName = SelectPrimitive.Label.displayName
 
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & { value: string }
+>(({ className, children, value, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
+    value={value}
     className={cn(
       'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
@@ -111,13 +111,24 @@ const SelectSeparator = React.forwardRef<
 ))
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
-export {
-  Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-  SelectLabel,
-  SelectItem,
-  SelectSeparator
-}
+export const CustomSelect = React.forwardRef<
+  React.ElementRef<typeof Select>,
+  React.ComponentPropsWithoutRef<typeof Select> & {
+    items: { value: string; label: React.ReactNode }[]
+  }
+>(({ items, className, ...props }, ref) => {
+  return (
+    <Select
+      ref={ref}
+      className={cn('w-full', className)}
+      defaultValue={items[0].value}
+    >
+      {items.map((item) => (
+        <SelectItem key={item.value} value={item.value}>
+          {item.label}
+        </SelectItem>
+      ))}
+    </Select>
+  )
+})
+CustomSelect.displayName = 'CustomSelect'
