@@ -2,32 +2,35 @@
 
 import * as React from 'react'
 
-export interface useCopyToClipboardProps {
+export interface UseCopyToClipboardProps {
   timeout?: number
 }
 
 export function useCopyToClipboard({
   timeout = 2000
-}: useCopyToClipboardProps) {
-  const [isCopied, setIsCopied] = React.useState<Boolean>(false)
+}: UseCopyToClipboardProps) {
+  const [isCopied, setIsCopied] = React.useState<boolean>(false)
 
-  const copyToClipboard = (value: string) => {
-    if (typeof window === 'undefined' || !navigator.clipboard?.writeText) {
-      return
-    }
+  const copyToClipboard = React.useCallback(
+    (value: string): void => {
+      if (typeof window === 'undefined' || !navigator.clipboard) {
+        return
+      }
 
-    if (!value) {
-      return
-    }
+      if (!value) {
+        return
+      }
 
-    navigator.clipboard.writeText(value).then(() => {
-      setIsCopied(true)
+      navigator.clipboard.writeText(value).then(() => {
+        setIsCopied(true)
 
-      setTimeout(() => {
-        setIsCopied(false)
-      }, timeout)
-    })
-  }
+        setTimeout(() => {
+          setIsCopied(false)
+        }, timeout)
+      })
+    },
+    [timeout]
+  )
 
   return { isCopied, copyToClipboard }
 }
