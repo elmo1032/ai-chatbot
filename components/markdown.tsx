@@ -1,9 +1,10 @@
 import { FC, memo } from 'react'
 import ReactMarkdown, { Options } from 'react-markdown'
 
-export const MemoizedReactMarkdown: FC<Options> = memo(
-  ReactMarkdown,
-  (prevProps, nextProps) =>
-    prevProps.children === nextProps.children &&
-    prevProps.className === nextProps.className
-)
+const MemoizedReactMarkdown: FC<Options> = memo(ReactMarkdown, (prevProps, nextProps) => {
+  const childrenChanged = prevProps.children !== nextProps.children
+  const classNameChanged = prevProps.className !== nextProps.className
+  return childrenChanged || classNameChanged
+})
+
+export default MemoizedReactMarkdown
