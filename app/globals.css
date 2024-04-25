@@ -4,75 +4,33 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --color-background-base: 0 0% 100%;
+    --color-foreground-base: 240 10% 3.9%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --color-muted-base: 240 4.8% 95.9%;
+    --color-muted-foreground-base: 240 3.8% 46.1%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --color-popover-base: 0 0% 100%;
+    --color-popover-foreground-base: 240 10% 3.9%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --color-card-base: 0 0% 100%;
+    --color-card-foreground-base: 240 10% 3.9%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
+    --color-border-base: 240 5.9% 90%;
+    --color-input-base: 240 5.9% 90%;
 
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
+    --color-primary-base: 240 5.9% 10%;
+    --color-primary-foreground-base: 0 0% 98%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --color-secondary-base: 240 4.8% 95.9%;
+    --color-secondary-foreground-base: 240 5.9% 10%;
 
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: ;
+    --color-accent-base: 240 4.8% 95.9%;
+    --color-accent-foreground-base: transparent;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --color-destructive-base: 0 84.2% 60.2%;
+    --color-destructive-foreground-base: 0 0% 98%;
 
-    --ring: 240 5% 64.9%;
+    --color-ring-base: 240 5% 64.9%;
 
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: ;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-
-    --ring: 240 3.7% 15.9%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
+    --border-radius-base: 0.5
