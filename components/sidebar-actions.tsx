@@ -26,8 +26,8 @@ import {
 
 interface SidebarActionsProps {
   chat: Chat
-  removeChat: (args: { id: string; path: string }) => ServerActionResult<void>
-  shareChat: (id: string) => ServerActionResult<Chat>
+  removeChat: (args: { id: string; path: string }) => Promise<ServerActionResult<void>>
+  shareChat: (id: string) => Promise<ServerActionResult<Chat>>
 }
 
 export function SidebarActions({
@@ -39,6 +39,43 @@ export function SidebarActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
+  const [removeError, setRemoveError] = React.useState<string | null>(null)
+  const [shareError, setShareError] = React.useState<string | null>(null)
+
+  const handleShareChat = async (id: string) => {
+    setShareError(null)
+    try {
+      const result = await shareChat(id)
+      if (result && 'error' in result) {
+        setShareError(result.error)
+        return
+      }
+      toast.success('Chat shared')
+      setShareDialogOpen(false)
+    } catch (error) {
+      setShareError('An error occurred while sharing the chat')
+    }
+  }
+
+  const handleRemoveChat = async (event: React.FormEvent<HTMLFormElement>, id: string, path: string) => {
+    event.preventDefault()
+    setRemoveError(null)
+    startRemoveTransition(async () => {
+      setDeleteDialogOpen(false)
+      try {
+        const result = await removeChat({ id, path })
+        if (result && 'error' in result) {
+          setRemoveError(result.error)
+          return
+        }
+        toast.success('Chat deleted')
+        router.refresh()
+        router.push('/')
+      } catch (error) {
+        setRemoveError('An error occurred while deleting the chat')
+      }
+    })
+  }
 
   return (
     <>
@@ -73,7 +110,7 @@ export function SidebarActions({
       </div>
       <ChatShareDialog
         chat={chat}
-        shareChat={shareChat}
+        shareChat={handleShareChat}
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
         onCopy={() => setShareDialogOpen(false)}
@@ -93,26 +130,7 @@ export function SidebarActions({
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={isRemovePending}
-              onClick={event => {
-                event.preventDefault()
-                // @ts-ignore
-                startRemoveTransition(async () => {
-                  const result = await removeChat({
-                    id: chat.id,
-                    path: chat.path
-                  })
-
-                  if (result && 'error' in result) {
-                    toast.error(result.error)
-                    return
-                  }
-
-                  setDeleteDialogOpen(false)
-                  router.refresh()
-                  router.push('/')
-                  toast.success('Chat deleted')
-                })
-              }}
+              onClick={(event) => handleRemoveChat(event, chat.id, chat.path)}
             >
               {isRemovePending && <IconSpinner className="mr-2 animate-spin" />}
               Delete
@@ -120,6 +138,9 @@ export function SidebarActions({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {removeError && toast.error(removeError)}
+      {shareError && toast.error(shareError)}
     </>
   )
 }
+
