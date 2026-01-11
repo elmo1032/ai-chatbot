@@ -79,3 +79,22 @@ export function UserMenu({ user }: UserMenuProps) {
               className="inline-flex items-center justify-between w-full text-xs"
             >
               Vercel Home
+              <IconExternalLink className="w-3 h-3 ml-auto" />
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() =>
+              signOut({
+                callbackUrl: '/'
+              })
+            }
+            className="text-xs"
+          >
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  )
+}

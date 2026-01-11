@@ -119,4 +119,9 @@ export async function clearChats(): Promise<{ error?: string }> {
     pipeline.zrem(`user:chat:${session.user.id}`, chat)
   }
 
-  // Execute the pipeline and rev
+  // Execute the pipeline and revalidate the path
+  await pipeline.exec()
+
+  revalidatePath('/')
+  return redirect('/')
+}
